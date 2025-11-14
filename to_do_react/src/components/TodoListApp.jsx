@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { Plus } from "lucide-react";
 
 import StatsBar from "./StatsBar";
@@ -7,23 +7,24 @@ import FilterTabs from "./FilterTabs";
 import TodoItem from "./TodoItem";
 
 export default function TodoListApp() {
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      title: "Complete project proposal",
-      description: "Write and submit the Q4 project proposal to the team",
-      dateAdded: "2024-11-10",
-      completed: false,
-    },
-    {
-      id: 2,
-      title: "Buy groceries",
-      description: "Milk, eggs, bread, and vegetables",
-      dateAdded: "2024-11-12",
-      completed: true,
-    },
+  
+ 
+  
+  const [todos, setTodos] = useState([{}
   ]);
+ useEffect(() => {
+  const fetchTodos = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/todos");
+      const data = await response.json();
+      setTodos(data);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
 
+  fetchTodos();
+}, []);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTodo, setNewTodo] = useState({
     title: "",
