@@ -15,14 +15,14 @@ export default function TodoListApp() {
  useEffect(() => {
   const fetchTodos = async () => {
     try {
-      const response = await fetch("http://localhost:8000/todos");
+      const response = await fetch("http://localhost:8000/todos/todos");
       const data = await response.json();
       setTodos(data);
     } catch (error) {
       console.error("Fetch error:", error);
     }
   };
-
+// fetch todos on component mount
   fetchTodos();
 }, []);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -33,20 +33,54 @@ export default function TodoListApp() {
 
   const [filter, setFilter] = useState("all");
 
-  const handleAddTodo = () => {
-    if (newTodo.title.trim()) {
-      const todo = {
-        id: Date.now(),
+  const handleAddTodo = async () => { // ⬅️ 1. Must be an async function
+    if (!newTodo.title.trim()) {
+        return; // Don't proceed if title is empty
+    }
+
+    // 💡 Data object for the server (remove client-side ID)
+    const todoPayload = {
         title: newTodo.title,
         description: newTodo.description,
-        dateAdded: new Date().toISOString().split("T")[0],
-        completed: false,
-      };
-      setTodos([todo, ...todos]);
-      setNewTodo({ title: "", description: "" });
-      setShowAddForm(false);
+        // TODO: Let the server handle dateAdded/completed status if possible
+        completed: false, 
+        //TODO: dateAdded: new Date().toISOString().split("T")[0], // Let server handle this, too
+    };
+
+    try {
+        // ⬅️ 2. Use await to get the actual HTTP Response object
+        const response = await fetch("http://localhost:8000/todos/add", { 
+            method: "POST", 
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify(todoPayload), 
+        });
+
+        // 3. Check if the request succeeded
+        if (response.ok) {
+            // ⬅️ 4. Use await to parse the JSON body
+            // This 'addedTodo' should contain the server-generated ID and final fields
+            const addedTodo = await response.json(); 
+            
+            // Assuming your server returns the new, complete todo object
+            // e.g., { id: 123, title: "...", dateAdded: "...", completed: false }
+
+            // 5. Update local state with the server's data
+            setTodos([ ...todos,addedTodo]); 
+            setNewTodo({ title: "", description: "" });
+            setShowAddForm(false);
+
+        } else {
+            // Handle HTTP errors (e.g., 400 Bad Request, 422 Validation Error)
+            const errorData = await response.json();
+            console.error("API Error:", errorData);
+            alert(`Failed to add todo: ${errorData.detail || response.statusText}`);
+        }
+    } catch (error) {
+        // Handle network errors (e.g., server offline)
+        console.error("Network Error adding todo:", error);
+        alert("Could not connect to the server.");
     }
-  };
+};
 
   const toggleComplete = (id) => {
     setTodos(
