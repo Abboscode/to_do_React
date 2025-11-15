@@ -88,9 +88,27 @@ export default function TodoListApp() {
     );
   };
 
-  const deleteTodo = (id) => {
+  const deleteTodo = async(id) => {
+try{
+const response = await fetch(`http://localhost:8000/todos/delete/${id}`, { method: "DELETE" });
+if (response.ok) {
+
     setTodos(todos.filter((t) => t.id !== id));
-  };
+    console.log(`Todo deleted successfully id:${id}`);
+  }else {
+            // 4. Handle HTTP errors (e.g., 404 Not Found, 500 Server Error)
+            // Read the JSON body to get the error details from FastAPI
+            const errorData = await response.json(); 
+            console.error("API Error:", errorData);
+            alert(`Failed to delete todo: ${errorData.detail || response.statusText}`);
+        }
+
+}catch(error){
+console.error("Error deleting todo:", error);
+
+}
+    
+};
 
   const filteredTodos = todos.filter((t) => {
     if (filter === "active") return !t.completed;
