@@ -15,7 +15,7 @@ export default function TodoListApp() {
  useEffect(() => {
   const fetchTodos = async () => {
     try {
-      const response = await fetch("http://localhost:8000/todos/todos");
+      const response = await fetch("https://abbossz.alwaysdata.net/todos/todos");
       const data = await response.json();
       setTodos(data);
     } catch (error) {
@@ -49,7 +49,7 @@ export default function TodoListApp() {
 
     try {
         // ⬅️ 2. Use await to get the actual HTTP Response object
-        const response = await fetch("http://localhost:8000/todos/add", { 
+        const response = await fetch("https://abbossz.alwaysdata.net/todos/add", { 
             method: "POST", 
             headers: { "Content-Type": "application/json" }, 
             body: JSON.stringify(todoPayload), 
@@ -90,7 +90,7 @@ export default function TodoListApp() {
 
   const deleteTodo = async(id) => {
 try{
-const response = await fetch(`http://localhost:8000/todos/delete/${id}`, { method: "DELETE" });
+const response = await fetch(`https://abbossz.alwaysdata.net/todos/delete/${id}`, { method: "DELETE" });
 if (response.ok) {
 
     setTodos(todos.filter((t) => t.id !== id));
