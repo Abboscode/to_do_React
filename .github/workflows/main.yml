@@ -1,0 +1,14 @@
+on:
+steps:
+  - uses: actions/checkout@v4
+
+  # Simple command line step
+  - name: 🚀 Step 1:Print Greeting
+    run: echo "Hello, GitHub Actions!"
+
+  # Another command line step to show context
+  - name: ⚙️ Step 2:Show Environment Details
+    run: |
+      echo "The current repository is ${{ github.repository }}"
+      echo "The runner OS is ${{ runner.os }}"
+      echo "Job execution completed successfully."
